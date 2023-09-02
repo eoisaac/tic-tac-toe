@@ -1,4 +1,5 @@
-import utils.*
+import utils.Color
+import utils.colorize
 
 typealias GameBoard = MutableList<String> // Define a type alias for the game board
 typealias Players = List<String> // Define a type alias for the players
@@ -85,6 +86,32 @@ fun getPlayerMove(player: String, players: Players, boardCells: GameBoard): Int 
     }
 }
 
+/*
+* This function receives a list of strings and checks if there is a winner. It returns true if there is a winner and
+* false if there is no winner. It uses the validateWinner function to check if there is a winner.
+* */
+fun validateWinner(boardCells: GameBoard): Boolean {
+    val winningCombinations = listOf( // Define the winning combinations
+        listOf(0, 1, 2), // Horizontal
+        listOf(3, 4, 5), // Horizontal
+        listOf(6, 7, 8), // Horizontal
+        listOf(0, 3, 6), // Vertical
+        listOf(1, 4, 7), // Vertical
+        listOf(2, 5, 8), // Vertical
+        listOf(0, 4, 8), // Diagonal
+        listOf(2, 4, 6), // Diagonal
+    )
+
+    for (combination in winningCombinations) { // Loop through the winning combinations
+        val (a, b, c) = combination // Destructure the combination into a, b and c
+        if (boardCells[a] == boardCells[b] && boardCells[b] == boardCells[c]) { // Check if the combination is a winner
+            return true // Return true if the combination is a winner
+        }
+    }
+
+    return false // Return false if no combination is a winner
+}
+
 
 fun main() {
     val players = listOf("X", "O") // Define the players, X and O
@@ -98,8 +125,15 @@ fun main() {
 
         val playerMove = getPlayerMove(currentPlayer, players, boardCells) // Get the player move
         boardCells[playerMove] = currentPlayer // Update the board cells with the player move
-
         currentPlayer = if (currentPlayer == players[0]) players[1] else players[0] // Switch the current player
+
+        val hasWinner = validateWinner(boardCells) // Check if there is a winner
+        if (hasWinner) { // Check if there is a winner
+            clearConsole() // Clear the console
+            printBoard(boardCells) // Print the game board with the current cells values
+            println(colorize("Player ${boardCells[playerMove]} won the game!", Color.GREEN)) // Print the winner
+            break // Break the loop
+        }
     }
 
 }
